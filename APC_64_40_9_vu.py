@@ -185,8 +185,8 @@ class APC_64_40_9_vu(APC):
         self._mixer.master_strip().set_volume_control(master_volume_control)
         self._slider_modes = SliderModesComponent(self._mixer, tuple(sliders))
         self._slider_modes.name = 'Slider_Modes'
-        matrix_modes = MatrixModesComponent(self._matrix, self._session, self._session_zoom, tuple(self._track_stop_buttons), self)
-        matrix_modes.name = 'Matrix_Modes'
+        self._matrix_modes = MatrixModesComponent(self._matrix, self._session, self._session_zoom, tuple(self._track_stop_buttons), self)
+        self._matrix_modes.name = 'Matrix_Modes'
         self._sequencer = StepSequencerComponent(self, self._session, self._matrix, tuple(self._track_stop_buttons))
         self._sequencer.set_bank_buttons(tuple(select_buttons))
         self._sequencer.set_nav_buttons(self._up_button, self._down_button, self._left_button, self._right_button)
@@ -197,7 +197,7 @@ class APC_64_40_9_vu(APC):
         self._sequencer.set_lane_mute_buttons(tuple(self._scene_launch_buttons))
         self._sequencer.set_loop_start_buttons(tuple(mute_buttons))
         self._sequencer.set_loop_length_buttons(tuple(solo_buttons))
-        self._shift_modes = ShiftableSelectorComponent(self, tuple(select_buttons), master_select_button, tuple(self._track_stop_buttons), self._stop_all_button, tuple(mute_buttons), tuple(solo_buttons), tuple(arm_buttons), tuple(self._scene_launch_buttons), self._matrix, self._session, self._session_zoom, self._mixer, self._slider_modes, matrix_modes, self._sequencer)
+        self._shift_modes = ShiftableSelectorComponent(self, tuple(select_buttons), master_select_button, tuple(self._track_stop_buttons), self._stop_all_button, tuple(mute_buttons), tuple(solo_buttons), tuple(arm_buttons), tuple(self._scene_launch_buttons), self._matrix, self._session, self._session_zoom, self._mixer, self._slider_modes, self._matrix_modes, self._sequencer)
         self._shift_modes.name = 'Shift_Modes'
         self._shift_modes.set_mode_toggle(self._shift_button)
 
@@ -311,6 +311,9 @@ class APC_64_40_9_vu(APC):
             self.song().view.select_device(device_to_select)
         self._device_component.set_device(device_to_select)
         return None
+
+    def _on_track_offset_changed(self):
+        self._matrix_modes._on_track_offset_changed()
 
     def _product_model_id_byte(self):
         return 115

@@ -142,9 +142,12 @@ class VUMeters(ControlSurfaceComponent):
         #setup classes
         for row_index in range(NUM_METERS):
           # The tracks we'll be pulling L and R RMS from
-          self._tracks[row_index] = self.song().tracks[row_index + session_offset]
+          if len(self.song().tracks) > row_index + session_offset:
+            self._tracks[row_index] = self.song().tracks[row_index + session_offset]
+          else:
+            self._tracks[row_index] = None
 
-          if (self._tracks[row_index] and self._tracks[row_index].has_audio_output):
+          if (self._tracks[row_index] != None and self._tracks[row_index].has_audio_output):
             self._meters[row_index] = VUMeter(self, self._tracks[row_index], 
                                   CHANNEL_SCALE_MAX, 
                                   CHANNEL_SCALE_MIN, CHANNEL_SCALE_INCREMENTS,
@@ -160,43 +163,24 @@ class VUMeters(ControlSurfaceComponent):
         
         self.song().master_track.add_output_meter_left_listener(self.master_meter.observe)
 
+        self.clip_warning(False)
+
         self._connected = True
         
 
     # If you fail to kill the listeners on shutdown, Ableton stores them in memory and punches you in the face
     def disconnect(self):
-      self._parent.log_message('Disconnecting VUMeters!')
-
       if self._connected == True:
 
         for row_index in range(NUM_METERS):
-          # self._parent.log_message('Disconnecting VUMeters', row_index)
           if (self._tracks[row_index] and self._tracks[row_index].has_audio_output and self._meters[row_index]):
-            # self._parent.log_message('It has a track and audio and a meter object')
             if (self._tracks[row_index].output_meter_left_has_listener(self._meters[row_index].observe) ):
-              # self._parent.log_message('It has a listener!')
-              # self._tracks[row_index].add_output_meter_left_listener(self._meters[row_index].observe)
               self._tracks[row_index].remove_output_meter_left_listener(self._meters[row_index].observe)
               self._meters[row_index] = None
-              self._parent.log_message('Listener removed!')
 
         self.song().master_track.remove_output_meter_left_listener(self.master_meter.observe)
 
         self._connected = False
-
-    # def unobserve(self):
-    #     self._parent.log_message('Unobserving VUMeters!')
-
-    #     if self._connected == True:
-
-    #       for row_index in range(NUM_METERS):
-    #         if (self._tracks[row_index] and self._tracks[row_index].has_audio_output and self._meters[row_index]):
-    #           self._parent.log_message('Unobserving meter #', row_index)
-    #           self._tracks[row_index].remove_output_meter_left_listener(self._meters[row_index].observe)
-
-    #       self.song().master_track.remove_output_meter_left_listener(self.master_meter.observe)
-
-    #     self._connected = False
 
     # Called when the Master clips. Makes the entire clip grid BRIGHT RED 
     def clip_warning(self, clipping):
@@ -209,6 +193,7 @@ class VUMeters(ControlSurfaceComponent):
             button.send_value(LED_RED, True)
           else:
             button.send_value(LED_OFF, True)
+            self._parent._track_stop_buttons[button_index].send_value(LED_OFF, True) #also zero the clip stop buttons when used as a reset
 
     def set_master_leds(self, level):
         for scene_index in range(CLIP_GRID_Y):

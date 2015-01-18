@@ -140,6 +140,7 @@ class APC(ControlSurface):
          width,
          height) == (-1, -1, -1, -1):
             ControlSurface._set_session_highlight(self, track_offset, scene_offset, width, height, include_return_tracks)
+            self._on_track_offset_changed()
 
     def _send_midi(self, midi_bytes, optimized = None):
         sent_successfully = False

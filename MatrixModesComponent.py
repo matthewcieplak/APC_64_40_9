@@ -47,6 +47,8 @@ class MatrixModesComponent(ModeSelectorComponent):
             button = self._track_stop_buttons[track_index]
             button_row.append(button)
         self._stop_button_matrix.add_row(tuple(button_row))
+        self._nav_left_button = None
+        self._nav_right_button = None
         self._mode_index = 0
         self._last_mode = 0
         self._parent = parent
@@ -116,10 +118,7 @@ class MatrixModesComponent(ModeSelectorComponent):
     def _set_modes(self):
         if self.is_enabled():
             if self._vu != None:
-                # self._vu.unobserve();
-                self._parent.log_message('Disconnecting VUMeters from MatrixModeComponent')
                 self._vu.disconnect()
-                # self._vu = False
             
             self._session.set_allow_update(False)
             self._session_zoom.set_allow_update(False)
@@ -175,16 +174,13 @@ class MatrixModesComponent(ModeSelectorComponent):
             elif (self._mode_index == 7):
                 self._set_note_mode(PATTERN_6, CHANNEL_6, NOTEMAP_6, True, False)
                 # VU Meters
+                self._session.set_enabled(False)
                 self._session_zoom._on_zoom_value(1) #zoom out
-                # self._session_zoom.set_zoom_button(None)
                 self._session_zoom.set_enabled(True)
                 self._session_zoom._is_zoomed_out = False
-                self._session.set_enabled(False)
-                # self._session_zoom.update()
-                if self._vu == None:
-                    self._vu = VUMeters(self._parent)
-                self._vu.observe( int(self._session_zoom._session.scene_offset()) )
-                #self.vu.connect();
+                self._session_zoom.set_zoom_button(None)
+                self._session_zoom.update()
+                self._update_vu_meters()
 
             else:
                 pass
@@ -225,6 +221,21 @@ class MatrixModesComponent(ModeSelectorComponent):
                 button.send_value(0, True)
         self._session.set_enabled(True)
         self._session.set_show_highlight(True)
+
+
+    def _on_track_offset_changed(self):
+        if (self.is_enabled() and self._mode_index == 7):
+            self._update_vu_meters()
+
+
+    def _update_vu_meters(self):
+        if self._vu == None:
+            self._vu = VUMeters(self._parent)
+        else:
+            self._vu.disconnect()
+        self._vu.observe( int(self._session_zoom._session.track_offset()) )
+
+        
 
 # local variables:
 # tab-width: 4
