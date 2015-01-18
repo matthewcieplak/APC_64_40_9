@@ -19,11 +19,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
 import Live 
-from APC_64_40_9 import APC_64_40_9
+from APC_64_40_9_vu import APC_64_40_9_vu
 
 def create_instance(c_instance):
     """ Creates and returns the APC_64_40_9 script """
-    return APC_64_40_9(c_instance)
+    return APC_64_40_9_vu(c_instance)
 
 from _Framework.Capabilities import *
 

@@ -27,6 +27,7 @@ from _Framework.MixerComponent import MixerComponent
 from _Framework.ButtonMatrixElement import ButtonMatrixElement
 from _Framework.ControlSurface import ControlSurface
 from Matrix_Maps import *
+from VUMeters import VUMeters
 
 class MatrixModesComponent(ModeSelectorComponent):
     ' SelectorComponent that assigns matrix to different functions '
@@ -50,6 +51,7 @@ class MatrixModesComponent(ModeSelectorComponent):
         self._last_mode = 0
         self._parent = parent
         self._parent.set_pad_translations(PAD_TRANSLATIONS) #comment out to remove Drum Rack mapping
+        self._vu = None
 
         
     def disconnect(self):
@@ -113,6 +115,12 @@ class MatrixModesComponent(ModeSelectorComponent):
     
     def _set_modes(self):
         if self.is_enabled():
+            if self._vu != None:
+                # self._vu.unobserve();
+                self._parent.log_message('Disconnecting VUMeters from MatrixModeComponent')
+                self._vu.disconnect()
+                # self._vu = False
+            
             self._session.set_allow_update(False)
             self._session_zoom.set_allow_update(False)
             assert (self._mode_index in range(self.number_of_modes()))
@@ -165,7 +173,19 @@ class MatrixModesComponent(ModeSelectorComponent):
             elif (self._mode_index == 6):
                 self._set_note_mode(PATTERN_5, CHANNEL_5, NOTEMAP_5, USE_STOP_ROW_5, IS_NOTE_MODE_5)
             elif (self._mode_index == 7):
-                self._set_note_mode(PATTERN_6, CHANNEL_6, NOTEMAP_6, USE_STOP_ROW_6, IS_NOTE_MODE_6)
+                self._set_note_mode(PATTERN_6, CHANNEL_6, NOTEMAP_6, True, False)
+                # VU Meters
+                self._session_zoom._on_zoom_value(1) #zoom out
+                # self._session_zoom.set_zoom_button(None)
+                self._session_zoom.set_enabled(True)
+                self._session_zoom._is_zoomed_out = False
+                self._session.set_enabled(False)
+                # self._session_zoom.update()
+                if self._vu == None:
+                    self._vu = VUMeters(self._parent)
+                self._vu.observe( int(self._session_zoom._session.scene_offset()) )
+                #self.vu.connect();
+
             else:
                 pass
             self._session.set_allow_update(True)

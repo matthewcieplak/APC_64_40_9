@@ -51,7 +51,8 @@ from EncoderDeviceComponent import EncoderDeviceComponent
 from StepSequencerComponent import StepSequencerComponent
 from ShiftableZoomingComponent import ShiftableZoomingComponent
 
-class APC_64_40_9(APC):
+
+class APC_64_40_9_vu(APC):
     """ Script for Akai's APC40 Controller """
     def __init__(self, c_instance):
         self._c_instance = c_instance
@@ -99,6 +100,7 @@ class APC_64_40_9(APC):
         self._session.set_stop_clip_value(0)
         self._session.set_stop_clip_triggered_value(2)
 
+        self._button_rows = []
         for scene_index in range(5):
             scene = self._session.scene(scene_index)
             scene.name = 'Scene_' + str(scene_index)
@@ -118,7 +120,13 @@ class APC_64_40_9(APC):
                 clip_slot.set_recording_value(3)
                 clip_slot.set_launch_button(button)
             self._matrix.add_row(tuple(button_row))
+            self._button_rows.append(button_row)
+        
+
+
         self._session.set_slot_launch_button(ButtonElement(is_momentary, MIDI_CC_TYPE, 0, 67))
+
+
         self._session.selected_scene().name = 'Selected_Scene'
         self._session.selected_scene().set_launch_button(ButtonElement(is_momentary, MIDI_CC_TYPE, 0, 64))
         self._session_zoom = ShiftableZoomingComponent(self._session, tuple(self._track_stop_buttons))
@@ -225,6 +233,7 @@ class APC_64_40_9(APC):
         detail_view_toggler.set_device_clip_toggle_button(device_bank_buttons[0])
         detail_view_toggler.set_detail_toggle_button(device_bank_buttons[4])
         detail_view_toggler.set_device_nav_buttons(device_bank_buttons[2], device_bank_buttons[3])
+        
         transport = ShiftableTransportComponent()
         transport.name = 'Transport'
         play_button = ButtonElement(is_momentary, MIDI_NOTE_TYPE, 0, 91)

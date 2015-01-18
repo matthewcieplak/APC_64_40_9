@@ -155,16 +155,16 @@ NOTEMAP_5 = ((41, 47, 53, 59, 65, 71, 77, 83), #Row 1
 
 #---------- Page 8 is User Mode 6
 
-USE_STOP_ROW_6 = True
-IS_NOTE_MODE_6 = False
+# USE_STOP_ROW_6 = True
+# IS_NOTE_MODE_6 = False
 
-PATTERN_6 = ((3, 3, 3, 3, 3, 3, 3, 3), #Row 1
-             (5, 5, 5, 5, 5, 5, 5, 5), #Row 2
-             (1, 1, 1, 1, 1, 1, 1, 1), #Row 3
-             (3, 3, 3, 3, 3, 3, 3, 3), #Row 4
-             (5, 5, 5, 5, 5, 5, 5, 5), #Row 5
-             (1, 1, 1, 1, 1, 1, 1, 1), #Clip Stop Row
-             ) #0=off, 1=green, 2=green blink, 3=red, 4=red blink, 5=yellow, 6=yellow blink, 7-127=green
+# PATTERN_6 = ((3, 3, 3, 3, 3, 3, 3, 3), #Row 1
+#              (5, 5, 5, 5, 5, 5, 5, 5), #Row 2
+#              (1, 1, 1, 1, 1, 1, 1, 1), #Row 3
+#              (3, 3, 3, 3, 3, 3, 3, 3), #Row 4
+#              (5, 5, 5, 5, 5, 5, 5, 5), #Row 5
+#              (1, 1, 1, 1, 1, 1, 1, 1), #Clip Stop Row
+#              ) #0=off, 1=green, 2=green blink, 3=red, 4=red blink, 5=yellow, 6=yellow blink, 7-127=green
 
 CHANNEL_6 = 14
 
@@ -175,6 +175,18 @@ NOTEMAP_6 = ((56, 57, 58, 59, 80, 81, 82, 83), #Row 1
              (40, 41, 42, 43, 64, 65, 66, 67), #Row 5
              (36, 37, 38, 39, 60, 61, 62, 63), #Clip Stop Row
              )
+
+USE_STOP_ROW_6 = True
+IS_NOTE_MODE_6 = False
+
+PATTERN_6 = ((0, 0, 0, 0, 0, 0, 0, 0), #Row 1
+             (0, 0, 0, 0, 0, 0, 0, 0), #Row 2
+             (0, 0, 0, 0, 0, 0, 0, 0), #Row 3
+             (0, 0, 0, 0, 0, 0, 0, 0), #Row 4
+             (0, 0, 0, 0, 0, 0, 0, 0), #Row 5
+             (0, 0, 0, 0, 0, 0, 0, 0), #Clip Stop Row
+             ) #0=off, 1=green, 2=green blink, 3=red, 4=red blink, 5=yellow, 6=yellow blink, 7-127=green
+
 
 #---------- Pad Translations for Drum Rack
 
