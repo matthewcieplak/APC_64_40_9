@@ -134,11 +134,13 @@ class VUMeters(ControlSurfaceComponent):
         # We don't start clipping
         self._clipping = False
         self._connected = False
+        self._session_offset = 0
 
 
     def observe(self, session_offset):
 
         
+        self._session_offset = session_offset
         #setup classes
         for row_index in range(NUM_METERS):
           # The tracks we'll be pulling L and R RMS from
@@ -233,6 +235,8 @@ class VUMeters(ControlSurfaceComponent):
 
     def on_track_list_changed(self):
         self.update()
+        self.disconnect()
+        self.observe(self._session_offset)
 
     def on_selected_scene_changed(self):
         self.update()

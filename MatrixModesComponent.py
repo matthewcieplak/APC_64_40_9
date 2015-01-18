@@ -178,7 +178,7 @@ class MatrixModesComponent(ModeSelectorComponent):
                 self._session_zoom._on_zoom_value(1) #zoom out
                 self._session_zoom.set_enabled(True)
                 self._session_zoom._is_zoomed_out = False
-                self._session_zoom.set_zoom_button(None)
+                self._session_zoom.set_zoom_button(self._parent._shift_button)
                 self._session_zoom.update()
                 self._update_vu_meters()
 
