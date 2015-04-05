@@ -54,6 +54,8 @@ class MatrixModesComponent(ModeSelectorComponent):
         self._parent = parent
         self._parent.set_pad_translations(PAD_TRANSLATIONS) #comment out to remove Drum Rack mapping
         self._vu = None
+        self._shift_button = self._parent._shift_button
+        self._shift_button.add_value_listener(self._shift_value)
 
         
     def disconnect(self):
@@ -65,6 +67,7 @@ class MatrixModesComponent(ModeSelectorComponent):
         self._matrix = None
         self._track_stop_buttons = None
         self._stop_button_matrix = None
+        self._shift_button.remove_value_listener(self._shift_value)
         ModeSelectorComponent.disconnect(self)
 
         
@@ -227,7 +230,16 @@ class MatrixModesComponent(ModeSelectorComponent):
         if (self.is_enabled() and self._mode_index == 7):
             self._update_vu_meters()
 
+    def _shift_value(self, value):
+        if (self.is_enabled() and self._mode_index == 7 and self._vu != None):
+            if value != 0:
+                self._vu.disconnect()
+                self._vu.disable()
+            else:
+                self._update_vu_meters()
+                self._vu.enable()
 
+    
     def _update_vu_meters(self):
         if self._vu == None:
             self._vu = VUMeters(self._parent)

@@ -135,28 +135,51 @@ class VUMeters(ControlSurfaceComponent):
         self._clipping = False
         self._connected = False
         self._session_offset = 0
+        self._enabled = True
 
 
     def observe(self, session_offset):
 
         
         self._session_offset = session_offset
-        #setup classes
+        visible_tracks = []
+
+        i = 0
+        while i < len(self.song().tracks):
+          track = self.song().tracks[i]
+          if track.is_visible:
+            visible_tracks.append(track)
+          i +=1
+
+        
         for row_index in range(NUM_METERS):
-          # The tracks we'll be pulling L and R RMS from
-          if len(self.song().tracks) > row_index + session_offset:
-            self._tracks[row_index] = self.song().tracks[row_index + session_offset]
-          else:
+          
+          # Add metering for visible tracks
+          if len(visible_tracks) > row_index + session_offset:
+            
+            self._tracks[row_index] = visible_tracks[row_index + session_offset]
+
+            if self._tracks[row_index].has_audio_output:
+              self._meters[row_index] = VUMeter(self, self._tracks[row_index], 
+                                    CHANNEL_SCALE_MAX, 
+                                    CHANNEL_SCALE_MIN, CHANNEL_SCALE_INCREMENTS,
+                                    [row_index])
+              self._tracks[row_index].add_output_meter_left_listener(self._meters[row_index].observe)
+          
+
+          else:   #meters exceed total visible tracks // reset any applicable listeners
+          
+            if (self._tracks[row_index] != None and self._meters[row_index] != None):
+              if (self._tracks[row_index].output_meter_left_has_listener(self._meters[row_index].observe) ):
+                self._tracks[row_index].remove_output_meter_left_listener(self._meters[row_index].observe)
+            
             self._tracks[row_index] = None
+            self._meters[row_index] = None
 
-          if (self._tracks[row_index] != None and self._tracks[row_index].has_audio_output):
-            self._meters[row_index] = VUMeter(self, self._tracks[row_index], 
-                                  CHANNEL_SCALE_MAX, 
-                                  CHANNEL_SCALE_MIN, CHANNEL_SCALE_INCREMENTS,
-                                  [row_index])
-            self._tracks[row_index].add_output_meter_left_listener(self._meters[row_index].observe)
+          
 
 
+        #self._parent.log_message("OBSERVE collapsed_count: %s  session_offset: %s" % (str(collapsed_count), str(session_offset)))
 
         self.master_meter = VUMeter(self, self.song().master_track,
                                     MASTER_SCALE_MAX,
@@ -183,6 +206,12 @@ class VUMeters(ControlSurfaceComponent):
         self.song().master_track.remove_output_meter_left_listener(self.master_meter.observe)
 
         self._connected = False
+
+    def disable(self):
+        self._enabled = False
+
+    def enable(self):
+        self._enabled = True
 
     # Called when the Master clips. Makes the entire clip grid BRIGHT RED 
     def clip_warning(self, clipping):
@@ -225,25 +254,26 @@ class VUMeters(ControlSurfaceComponent):
 
     # boilerplate
     def update(self):
+        # self.update()
+        self.disconnect()
+        if (self._enabled):
+          self.observe(self._session_offset)
         pass
 
     def on_enabled_changed(self):
         self.update()
 
     def on_selected_track_changed(self):
-        self.update()
+        pass
 
     def on_track_list_changed(self):
         self.update()
-        self.disconnect()
-        self.observe(self._session_offset)
 
     def on_selected_scene_changed(self):
-        self.update()
+        pass
 
     def on_scene_list_changed(self):
-
-        self.update()
+        pass
 
 
 
